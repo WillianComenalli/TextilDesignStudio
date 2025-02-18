@@ -1,14 +1,16 @@
 import { IStorage } from "./types";
 import {
-  users, projects, patterns, briefings, references,
+  users, projects, patterns, briefings, references, approvalStages, approvalHistory,
   type User, type InsertUser,
   type Project, type InsertProject,
   type Pattern, type InsertPattern,
   type Briefing, type InsertBriefing,
-  type Reference, type InsertReference
+  type Reference, type InsertReference,
+  type ApprovalStage, type InsertApprovalStage,
+  type ApprovalHistory, type InsertApprovalHistory
 } from "@shared/schema";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
@@ -59,6 +61,37 @@ export class DatabaseStorage implements IStorage {
   async createPattern(pattern: InsertPattern): Promise<Pattern> {
     const [newPattern] = await db.insert(patterns).values(pattern).returning();
     return newPattern;
+  }
+
+  async getApprovalStages(): Promise<ApprovalStage[]> {
+    return await db.select().from(approvalStages).orderBy(approvalStages.order);
+  }
+
+  async createApprovalStage(stage: InsertApprovalStage): Promise<ApprovalStage> {
+    const [newStage] = await db.insert(approvalStages).values(stage).returning();
+    return newStage;
+  }
+
+  async getPatternApprovals(patternId: number): Promise<ApprovalHistory[]> {
+    return await db
+      .select()
+      .from(approvalHistory)
+      .where(eq(approvalHistory.patternId, patternId))
+      .orderBy(approvalHistory.createdAt);
+  }
+
+  async createApprovalHistory(approval: InsertApprovalHistory): Promise<ApprovalHistory> {
+    const [newApproval] = await db.insert(approvalHistory).values(approval).returning();
+    return newApproval;
+  }
+
+  async updatePatternStage(patternId: number, currentStage: number): Promise<Pattern> {
+    const [updatedPattern] = await db
+      .update(patterns)
+      .set({ currentStage })
+      .where(eq(patterns.id, patternId))
+      .returning();
+    return updatedPattern;
   }
 
   async getBriefings(projectId: number): Promise<Briefing[]> {

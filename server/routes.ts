@@ -34,6 +34,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.status(201).json(pattern);
   });
 
+  // Approval system endpoints
+  app.get("/api/approval-stages", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    const stages = await storage.getApprovalStages();
+    res.json(stages);
+  });
+
+  app.get("/api/patterns/:id/approvals", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    const approvals = await storage.getPatternApprovals(Number(req.params.id));
+    res.json(approvals);
+  });
+
+  app.post("/api/patterns/:id/approve", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    const { stageId, status, comments } = req.body;
+
+    const approval = await storage.createApprovalHistory({
+      patternId: Number(req.params.id),
+      stageId,
+      approvedBy: req.user.id,
+      status,
+      comments,
+    });
+
+    // Se aprovado, atualiza o estágio atual do padrão
+    if (status === "approved") {
+      const stages = await storage.getApprovalStages();
+      const currentStageIndex = stages.findIndex(s => s.id === stageId);
+      const nextStage = stages[currentStageIndex + 1];
+
+      if (nextStage) {
+        await storage.updatePatternStage(Number(req.params.id), nextStage.id);
+      }
+    }
+
+    res.status(201).json(approval);
+  });
+
   app.get("/api/projects/:id/briefings", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     const briefings = await storage.getBriefings(Number(req.params.id));
