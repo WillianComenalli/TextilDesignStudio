@@ -59,6 +59,11 @@ export const insertBriefingSchema = createInsertSchema(briefings);
 export const insertReferenceSchema = createInsertSchema(references);
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
+export type InsertProject = z.infer<typeof insertProjectSchema>;
+export type InsertPattern = z.infer<typeof insertPatternSchema>;
+export type InsertBriefing = z.infer<typeof insertBriefingSchema>;
+export type InsertReference = z.infer<typeof insertReferenceSchema>;
+
 export type User = typeof users.$inferSelect;
 export type Project = typeof projects.$inferSelect;
 export type Pattern = typeof patterns.$inferSelect;
