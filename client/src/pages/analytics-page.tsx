@@ -1,7 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { Download, Calendar } from "lucide-react";
+import { Download, Calendar, ChevronLeft } from "lucide-react";
+import { Link } from "wouter";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, BarChart, Bar, ResponsiveContainer } from 'recharts';
 
 const productivityData = [
@@ -28,10 +29,18 @@ export default function AnalyticsPage() {
           <h1 className="text-3xl font-bold">Analytics & Reports</h1>
           <p className="text-muted-foreground">Track productivity and team performance</p>
         </div>
-        <Button>
-          <Download className="mr-2 h-4 w-4" />
-          Export Report
-        </Button>
+        <div className="flex gap-2">
+          <Button asChild>
+            <Link href="/">
+              <ChevronLeft className="mr-2 h-4 w-4" />
+              Voltar
+            </Link>
+          </Button>
+          <Button>
+            <Download className="mr-2 h-4 w-4" />
+            Export Report
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
