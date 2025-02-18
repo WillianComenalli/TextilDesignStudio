@@ -11,11 +11,13 @@ import AnalyticsPage from "@/pages/analytics-page";
 import PatternPage from "@/pages/pattern-page";
 import ProjectPage from "./pages/project-page";
 import WorkflowPage from "./pages/workflow-page";
+import TeamProfilePage from "./pages/team-profile-page";
 
 function Router() {
   return (
     <Switch>
       <Route path="/auth" component={AuthPage} />
+      <Route path="/team-profile" component={TeamProfilePage} />
       <ProtectedRoute path="/" component={DashboardPage} />
       <ProtectedRoute path="/analytics" component={AnalyticsPage} />
       <ProtectedRoute path="/patterns/:id" component={PatternPage} />
