@@ -161,7 +161,7 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {Array.from({length: 3}).map((_, i) => (
+                  {Array.from({ length: 3 }).map((_, i) => (
                     <div key={i} className="flex items-center gap-4">
                       <div className="h-10 w-10 rounded-lg bg-gray-100 flex items-center justify-center">
                         <Palette className="h-5 w-5 text-gray-500" />
@@ -170,7 +170,9 @@ export default function DashboardPage() {
                         <h4 className="text-sm font-medium">Pattern Design {i + 1}</h4>
                         <p className="text-xs text-gray-500">Due in {3 - i} days</p>
                       </div>
-                      <Button size="sm" variant="outline" className="ml-auto">View</Button>
+                      <Link href={`/patterns/${i+1}`}> {/* Assumed pattern id is i+1 */}
+                        <Button size="sm" variant="outline" className="ml-auto">View</Button>
+                      </Link>
                     </div>
                   ))}
                 </div>

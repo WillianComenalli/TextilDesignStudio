@@ -34,6 +34,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.status(201).json(pattern);
   });
 
+  // Adicionar esta nova rota junto com as outras rotas de patterns
+  app.get("/api/patterns/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    const [pattern] = await storage.getPatterns(Number(req.params.id));
+    if (!pattern) return res.sendStatus(404);
+    res.json(pattern);
+  });
+
   // Approval system endpoints
   app.get("/api/approval-stages", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);

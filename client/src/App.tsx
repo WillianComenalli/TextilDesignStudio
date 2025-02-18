@@ -8,6 +8,7 @@ import NotFound from "@/pages/not-found";
 import AuthPage from "@/pages/auth-page";
 import DashboardPage from "@/pages/dashboard-page";
 import AnalyticsPage from "@/pages/analytics-page";
+import PatternPage from "@/pages/pattern-page";
 
 function Router() {
   return (
@@ -15,6 +16,7 @@ function Router() {
       <Route path="/auth" component={AuthPage} />
       <ProtectedRoute path="/" component={DashboardPage} />
       <ProtectedRoute path="/analytics" component={AnalyticsPage} />
+      <ProtectedRoute path="/patterns/:id" component={PatternPage} />
       <Route component={NotFound} />
     </Switch>
   );
