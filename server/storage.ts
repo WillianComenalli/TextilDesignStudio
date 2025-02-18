@@ -1,104 +1,83 @@
 import { IStorage } from "./types";
 import {
-  User, InsertUser,
-  Project, InsertProject,
-  Pattern, InsertPattern,
-  Briefing, InsertBriefing,
-  Reference, InsertReference
+  users, projects, patterns, briefings, references,
+  type User, type InsertUser,
+  type Project, type InsertProject,
+  type Pattern, type InsertPattern,
+  type Briefing, type InsertBriefing,
+  type Reference, type InsertReference
 } from "@shared/schema";
-import createMemoryStore from "memorystore";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 import session from "express-session";
+import connectPg from "connect-pg-simple";
+import { pool } from "./db";
 
-const MemoryStore = createMemoryStore(session);
+const PostgresSessionStore = connectPg(session);
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private projects: Map<number, Project>;
-  private patterns: Map<number, Pattern>;
-  private briefings: Map<number, Briefing>;
-  private references: Map<number, Reference>;
+export class DatabaseStorage implements IStorage {
   sessionStore: session.SessionStore;
-  currentId: number;
 
   constructor() {
-    this.users = new Map();
-    this.projects = new Map();
-    this.patterns = new Map();
-    this.briefings = new Map();
-    this.references = new Map();
-    this.currentId = 1;
-    this.sessionStore = new MemoryStore({
-      checkPeriod: 86400000,
+    this.sessionStore = new PostgresSessionStore({ 
+      pool, 
+      createTableIfMissing: true 
     });
   }
 
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentId++;
-    const user = { ...insertUser, id };
-    this.users.set(id, user);
+    const [user] = await db.insert(users).values(insertUser).returning();
     return user;
   }
 
   async getProjects(clientId?: number): Promise<Project[]> {
-    const projects = Array.from(this.projects.values());
-    return clientId ? projects.filter(p => p.clientId === clientId) : projects;
+    if (clientId) {
+      return await db.select().from(projects).where(eq(projects.clientId, clientId));
+    }
+    return await db.select().from(projects);
   }
 
   async createProject(project: InsertProject): Promise<Project> {
-    const id = this.currentId++;
-    const newProject = { ...project, id };
-    this.projects.set(id, newProject);
+    const [newProject] = await db.insert(projects).values(project).returning();
     return newProject;
   }
 
   async getPatterns(projectId: number): Promise<Pattern[]> {
-    return Array.from(this.patterns.values()).filter(
-      p => p.projectId === projectId
-    );
+    return await db.select().from(patterns).where(eq(patterns.projectId, projectId));
   }
 
   async createPattern(pattern: InsertPattern): Promise<Pattern> {
-    const id = this.currentId++;
-    const newPattern = { ...pattern, id };
-    this.patterns.set(id, newPattern);
+    const [newPattern] = await db.insert(patterns).values(pattern).returning();
     return newPattern;
   }
 
   async getBriefings(projectId: number): Promise<Briefing[]> {
-    return Array.from(this.briefings.values()).filter(
-      b => b.projectId === projectId
-    );
+    return await db.select().from(briefings).where(eq(briefings.projectId, projectId));
   }
 
   async createBriefing(briefing: InsertBriefing): Promise<Briefing> {
-    const id = this.currentId++;
-    const newBriefing = { ...briefing, id };
-    this.briefings.set(id, newBriefing);
+    const [newBriefing] = await db.insert(briefings).values(briefing).returning();
     return newBriefing;
   }
 
   async getReferences(projectId: number): Promise<Reference[]> {
-    return Array.from(this.references.values()).filter(
-      r => r.projectId === projectId
-    );
+    return await db.select().from(references).where(eq(references.projectId, projectId));
   }
 
   async createReference(reference: InsertReference): Promise<Reference> {
-    const id = this.currentId++;
-    const newReference = { ...reference, id };
-    this.references.set(id, newReference);
+    const [newReference] = await db.insert(references).values(reference).returning();
     return newReference;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
