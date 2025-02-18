@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Home, MessageSquare, FileText, Target, BarChart2, Settings, LogOut, Users, Palette } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Link } from "wouter";
 
 export default function DashboardPage() {
   const { user, logoutMutation } = useAuth();
@@ -64,6 +65,14 @@ export default function DashboardPage() {
                     <Users className="h-4 w-4" />
                     <span>Teams</span>
                   </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <Link href="/analytics">
+                    <SidebarMenuButton>
+                      <BarChart2 className="h-4 w-4" />
+                      <span>Analytics</span>
+                    </SidebarMenuButton>
+                  </Link>
                 </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroup>
