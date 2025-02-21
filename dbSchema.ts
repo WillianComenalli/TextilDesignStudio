@@ -30,7 +30,6 @@ export const patterns = pgTable("patterns", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-// New table for approval stages
 export const approvalStages = pgTable("approval_stages", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
@@ -39,13 +38,12 @@ export const approvalStages = pgTable("approval_stages", {
   requiredRole: text("required_role").notNull(),
 });
 
-// New table for approval history
 export const approvalHistory = pgTable("approval_history", {
   id: serial("id").primaryKey(),
   patternId: integer("pattern_id").references(() => patterns.id),
   stageId: integer("stage_id").references(() => approvalStages.id),
   approvedBy: integer("approved_by").references(() => users.id),
-  status: text("status").notNull(), // 'approved', 'rejected', 'pending'
+  status: text("status").notNull(),
   comments: text("comments"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
@@ -66,7 +64,7 @@ export const references = pgTable("references", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-// Update schemas to include new fields
+// Schema definitions
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
@@ -82,7 +80,7 @@ export const insertApprovalHistorySchema = createInsertSchema(approvalHistory);
 export const insertBriefingSchema = createInsertSchema(briefings);
 export const insertReferenceSchema = createInsertSchema(references);
 
-// Export types
+// Type definitions
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type InsertProject = z.infer<typeof insertProjectSchema>;
 export type InsertPattern = z.infer<typeof insertPatternSchema>;

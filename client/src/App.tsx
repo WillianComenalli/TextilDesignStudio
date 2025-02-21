@@ -13,6 +13,9 @@ import ProjectPage from "./pages/project-page";
 import WorkflowPage from "./pages/workflow-page";
 import TeamProfilePage from "./pages/team-profile-page";
 
+require('dotenv').config();
+const databaseUrl = process.env.DATABASE_URL;
+
 function Router() {
   return (
     <Switch>
